@@ -14,9 +14,17 @@ module.exports = {
     response.header("X-Total-Count", count);
 
     const cases = await connection("cases")
+      .join("ongs", "ongs.id", "=", "cases.ong_id")
       .limit(limit)
       .offset(offset)
-      .select("cases.*");
+      .select(
+        "cases.title",
+        "cases.description",
+        "cases.value",
+        "ongs.name",
+        "ongs.whatsapp",
+        "ongs.email"
+      );
 
     return response.json(cases);
   },
