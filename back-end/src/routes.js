@@ -36,6 +36,6 @@ routes.get("/cases", CaseController.index);
 routes.post("/cases", CaseController.create);
 routes.delete("/cases/:id", CaseController.delete);
 
-routes.get("/cases", ProfileController.index);
+routes.get("/profile", ProfileController.index);
 
 module.exports = routes;

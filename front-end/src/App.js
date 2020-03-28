@@ -1,7 +1,11 @@
 import React from "react";
 
+import Routes from "./routes";
+
+import "./global.css";
+
 const App = () => {
-  return <h1>Hello World</h1>;
+  return <Routes />;
 };
 
 export default App;

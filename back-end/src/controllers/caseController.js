@@ -3,7 +3,7 @@ const connection = require("../database/index");
 module.exports = {
   async index(request, response) {
     const { page = 1 } = request.query;
-    const limit = 5;
+    const limit = 10;
     const offset = (page - 1) * limit;
 
     const [countQuery] = await connection("cases")
@@ -14,10 +14,9 @@ module.exports = {
     response.header("X-Total-Count", count);
 
     const cases = await connection("cases")
-      .join("ongs", "ongs-id", "=", "cases.ong-id")
       .limit(limit)
       .offset(offset)
-      .select("cases.*", "ongs.name", "ongs.email", "ongs.city", "ongs.uf");
+      .select("cases.*");
 
     return response.json(cases);
   },
