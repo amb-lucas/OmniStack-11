@@ -54,10 +54,12 @@ module.exports = {
 
     const cases = await connection("cases")
       .where("id", id)
-      .select("ong_id")
-      .first();
+      .select("ong_id");
 
-    if (cases.ong_id !== ong_id) {
+    if (cases.length === 0) return response.status(410).send();
+
+    const caso = cases.first();
+    if (caso.ong_id !== ong_id) {
       return response.status(401).json({
         error: "Operation not allowed"
       });

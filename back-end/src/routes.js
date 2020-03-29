@@ -1,5 +1,5 @@
 const express = require("express");
-const crypto = require("crypto");
+const { celebrate, Segments, Joi } = require("celebrate");
 
 const OngController = require("./controllers/ongController");
 const CaseController = require("./controllers/caseController");
@@ -27,15 +27,96 @@ const routes = express.Router();
   acessar com request.headers
 */
 
-routes.post("/sessions", SessionController.create);
+// SESSIONS
+// Autenticação
+routes.post(
+  "/sessions",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      id: Joi.string().required()
+    })
+  }),
+  SessionController.create
+);
 
+// ONGS
+// Listar todas as ONGs
 routes.get("/ongs", OngController.index);
-routes.post("/ongs", OngController.create);
 
-routes.get("/cases", CaseController.index);
-routes.post("/cases", CaseController.create);
-routes.delete("/cases/:id", CaseController.delete);
+// Criar uma nova ONG
+routes.post(
+  "/ongs",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      name: Joi.string().required(),
+      email: Joi.string()
+        .required()
+        .email(),
+      whatsapp: Joi.number(),
+      whatsapp: Joi.string()
+        .required()
+        .min(10)
+        .max(13),
+      city: Joi.string().required(),
+      uf: Joi.string()
+        .required()
+        .length(2)
+    })
+  }),
+  OngController.create
+);
 
-routes.get("/profile", ProfileController.index);
+// CASES
+// Ver todos os casos (paginado)
+routes.get(
+  "/cases",
+  celebrate({
+    [Segments.QUERY]: Joi.object().keys({
+      page: Joi.number().min(1)
+    })
+  }),
+  CaseController.index
+);
+
+// Criar novo caso
+routes.post(
+  "/cases",
+  celebrate({
+    [Segments.BODY]: Joi.object().keys({
+      title: Joi.string().required(),
+      description: Joi.string().required(),
+      value: Joi.number()
+        .required()
+        .min(0)
+    }),
+    [Segments.HEADERS]: Joi.object({
+      authorization: Joi.string().required()
+    }).unknown()
+  }),
+  CaseController.create
+);
+
+// Deletar caso
+routes.delete(
+  "/cases/:id",
+  celebrate({
+    [Segments.PARAMS]: Joi.object({
+      id: Joi.number().required()
+    })
+  }),
+  CaseController.delete
+);
+
+// PROFILE
+// Ver casos a partir de uma ONG
+routes.get(
+  "/profile",
+  celebrate({
+    [Segments.HEADERS]: Joi.object({
+      authorization: Joi.string().required()
+    }).unknown()
+  }),
+  ProfileController.index
+);
 
 module.exports = routes;
