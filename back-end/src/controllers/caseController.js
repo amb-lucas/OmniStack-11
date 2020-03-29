@@ -18,12 +18,15 @@ module.exports = {
       .limit(limit)
       .offset(offset)
       .select(
+        "cases.id",
         "cases.title",
         "cases.description",
         "cases.value",
         "ongs.name",
         "ongs.whatsapp",
-        "ongs.email"
+        "ongs.email",
+        "ongs.city",
+        "ongs.uf"
       );
 
     return response.json(cases);

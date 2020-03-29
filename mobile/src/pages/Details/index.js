@@ -1,6 +1,6 @@
 import React from "react";
 import { Feather } from "@expo/vector-icons";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import { View, Image, Text, TouchableOpacity, Linking } from "react-native";
 import { composeAsync as composeMail } from "expo-mail-composer";
 
@@ -8,25 +8,39 @@ import logoImg from "../../assets/logo.png";
 
 import styles from "./styles";
 
-function Details() {
+const Details = () => {
   const navigation = useNavigation();
+  const route = useRoute();
+
   const navigateBack = () => {
     navigation.goBack();
   };
 
-  const message =
-    'Olá APAD,\n\n Estou entrando em contato pois gostaria de ajudar no caso "Cadelinha atropelada" com o valor de R$ 120,00';
+  const {
+    title,
+    name: ongName,
+    value,
+    whatsapp,
+    email,
+    city,
+    uf
+  } = route.params.caso;
+
+  const message = `Olá ${ongName},\nEstou entrando em contato pois gostaria de ajudar no caso "${title}" com o valor de ${Intl.NumberFormat(
+    "pt-BR",
+    { style: "currency", currency: "BRL" }
+  ).format(value)}`;
 
   const sendMail = () => {
     composeMail({
-      subject: "Herói do Caso: Cadelinha atropelada",
-      recipients: ["thexzguy@yahoo.com"],
+      subject: `Herói do Caso: ${title}`,
+      recipients: [email],
       body: message
     });
   };
 
   const sendWhatsapp = () => {
-    Linking.openURL(`whatsapp://send?phone=5581994998360&text=${message}`);
+    Linking.openURL(`whatsapp://send?phone=${whatsapp}&text=${message}`);
   };
 
   return (
@@ -40,14 +54,21 @@ function Details() {
       </View>
 
       <View style={styles.cases}>
-        <Text style={styles.caseProperty}>CASO</Text>
-        <Text style={styles.caseValue}>Doguinha perdida</Text>
-
         <Text style={styles.caseProperty}>ONG</Text>
-        <Text style={styles.caseValue}>Doguinhos do Céu</Text>
+        <Text style={styles.caseValue}>
+          {ongName}, {city}-{uf}
+        </Text>
+
+        <Text style={styles.caseProperty}>CASO</Text>
+        <Text style={styles.caseValue}>{title}</Text>
 
         <Text style={styles.caseProperty}>VALOR</Text>
-        <Text style={[styles.caseValue, { marginBottom: 0 }]}>R$ 120,00</Text>
+        <Text style={[styles.caseValue, { marginBottom: 0 }]}>
+          {Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+          }).format(value)}
+        </Text>
       </View>
 
       <View style={styles.contactBox}>
@@ -67,6 +88,6 @@ function Details() {
       </View>
     </View>
   );
-}
+};
 
 export default Details;
