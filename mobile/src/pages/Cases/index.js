@@ -16,21 +16,28 @@ const Cases = () => {
 
   const [cases, setCases] = useState([]);
   const [total, setTotal] = useState(0);
+
   const [page, setPage] = useState(0);
   const [loading, setLoading] = useState(false);
+
   const loadCases = async () => {
-    if (!loading && (total === 0 || cases.length < total)) {
-      setPage(page + 1);
+    if (loading) return;
+
+    if (page === 0 || cases.length < total) {
       setLoading(true);
+
       const response = await Api.get("cases", {
-        params: { page }
+        params: { page: page + 1 }
       });
+
       setLoading(false);
+      setPage(page + 1);
 
       setCases([...cases, ...response.data]);
       setTotal(response.headers["x-total-count"]);
     }
   };
+
   useEffect(() => {
     loadCases();
   }, []);
